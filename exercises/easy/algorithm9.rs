@@ -37,7 +37,20 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut idx = self.count;
+        
+        // 上浮：如果当前节点比父节点更符合堆的性质，则交换它们
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent]) {
+                self.items.swap(idx, parent);
+                idx = parent;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -56,9 +69,24 @@ where
         self.left_child_idx(idx) + 1
     }
 
-    fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+     fn smallest_child_idx(&self, idx: usize) -> usize {
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        
+        if right <= self.count {
+            // 如果右子节点存在，比较左右子节点
+            if (self.comparator)(&self.items[right], &self.items[left]) {
+                right
+            } else {
+                left
+            }
+        } else if left <= self.count {
+            // 如果只有左子节点存在
+            left
+        } else {
+            // 如果没有子节点，返回当前节点
+            idx
+        }
     }
 }
 
@@ -83,9 +111,35 @@ where
 {
     type Item = T;
 
-    fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+       fn next(&mut self) -> Option<T> {
+        if self.count == 0 {
+            return None;
+        }
+
+        // 保存堆顶元素
+        let result = Some(std::mem::replace(&mut self.items[1], T::default()));
+        
+        // 将最后一个元素移到堆顶
+        if self.count > 1 {
+            self.items[1] = self.items.pop().unwrap();
+        } else {
+            self.items.pop();
+        }
+        self.count -= 1;
+
+        // 下沉：维护堆的性质
+        let mut current = 1;
+        while self.children_present(current) {
+            let child = self.smallest_child_idx(current);
+            if (self.comparator)(&self.items[child], &self.items[current]) {
+                self.items.swap(current, child);
+                current = child;
+            } else {
+                break;
+            }
+        }
+
+        result
     }
 }
 

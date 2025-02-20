@@ -52,41 +52,56 @@ impl<T> Default for Queue<T> {
     }
 }
 
-pub struct myStack<T>
-{
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+pub struct MyStack<T> {
+    q1: Queue<T>,
+    q2: Queue<T>
 }
-impl<T> myStack<T> {
+
+impl<T> MyStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
+            q1: Queue::<T>::new(),
+            q2: Queue::<T>::new()
         }
     }
+
     pub fn push(&mut self, elem: T) {
-        //TODO
+        self.q1.enqueue(elem);
     }
+
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+        if self.q1.is_empty() {
+            return Err("Stack is empty");
+        }
+        
+        while self.q1.size() > 1 {
+            let val = self.q1.dequeue().unwrap();
+            self.q2.enqueue(val);
+        }
+
+        // 先完全获取值，避免借用冲突
+        let val = self.q1.dequeue().unwrap();
+        
+        // 交换队列
+        std::mem::swap(&mut self.q1, &mut self.q2);
+        
+        // 返回已经获取的值
+        Ok(val)
     }
+
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.q1.is_empty()
     }
 }
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-	
-	#[test]
-	fn test_queue(){
-		let mut s = myStack::<i32>::new();
-		assert_eq!(s.pop(), Err("Stack is empty"));
+    use super::*;
+    
+    #[test]
+    fn test_queue(){
+        let mut s = MyStack::<i32>::new();
+        assert_eq!(s.pop(), Err("Stack is empty"));
         s.push(1);
         s.push(2);
         s.push(3);
@@ -100,5 +115,5 @@ mod tests {
         assert_eq!(s.pop(), Ok(1));
         assert_eq!(s.pop(), Err("Stack is empty"));
         assert_eq!(s.is_empty(), true);
-	}
+    }
 }
