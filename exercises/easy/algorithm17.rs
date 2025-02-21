@@ -10,10 +10,15 @@
 */
 
 use std::fmt::{self, Display, Formatter};
+use std::collections::HashSet;
 
 pub fn intersection(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
-    // TODO: Implement the logic to find the intersection of two arrays
-    Vec::new() // Placeholder return value
+    // 将第一个数组转换为 HashSet
+    let set1: HashSet<_> = nums1.into_iter().collect();
+    // 将第二个数组转换为 HashSet
+    let set2: HashSet<_> = nums2.into_iter().collect();
+    // 计算两个 HashSet 的交集并收集为 Vec
+    set1.intersection(&set2).cloned().collect()
 }
 
 #[cfg(test)]
