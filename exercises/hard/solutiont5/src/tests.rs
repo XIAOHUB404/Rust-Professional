@@ -29,6 +29,11 @@ mod tests {
             let result = retire_time(*time, *tp);
             let duration = start.elapsed();
 
+            println!("测试用例: {} {}", time, tp);
+            println!("期望输出: {}", expected);
+            println!("实际输出: {}", result);
+            println!("执行时间: {:?}\n", duration);
+
             // 时间超0.2s，判定不合格
             if duration <= Duration::from_millis(200) && result == *expected {
                 total_score += 10.0;
